@@ -1,19 +1,19 @@
-FROM golang:1.21-alpine
+FROM golang:1.23.5-alpine
 
 WORKDIR /app
 
-# Копируем go.mod и go.sum, чтобы только при изменении зависимостей перезапускалась сборка
+# Копируем go.mod и go.sum
 COPY go.mod go.sum ./
 RUN go mod download
 
 # Копируем все файлы проекта
-COPY . .
+COPY . ./
 
 # Сборка бинарника для мониторинга
 RUN go build -o monitor ./cmd/monitor
 
-# Сборка бинарника для Telegram бота
-RUN go build -o telegrambot ./pkg/telegram
+# Устанавливаем права на выполнение для исполнимого файла
+RUN chmod +x /app/monitor
 
 # Команда, которая будет запускаться при старте контейнера
-CMD ["sh", "-c", "./monitor & ./telegrambot"]
+CMD ["./monitor"]
